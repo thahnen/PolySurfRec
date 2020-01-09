@@ -5,27 +5,34 @@ project(PolySurfRec
         HOMEPAGE_URL    "https://github.com/thahnen/PolySurfRec"
         LANGUAGES       CXX)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # Eigen required for CGAL
 find_package(Eigen3 3.3 REQUIRED)
 
 # SCIP required for CGAL to work with polygonal surface reconstruction
 # => an alternative would be GLPK
+# => TODO: add GLPK support (also in C++)
 find_package(SCIP REQUIRED)
 
 # CGAL required for surface reconstruction
 find_package(CGAL REQUIRED)
 
-#
-add_executable(PolySurfRec main.cpp)
+# Include directory
+include_directories(./include)
 
-#
+# Adds files to the executable
+add_executable(PolySurfRec
+        include/filehandler.h
+        main.cpp)
+
+# Add preprocessor macro for C++
+# TODO: add GLPK support
 target_compile_definitions(PolySurfRec
         PUBLIC
             CGAL_USE_SCIP)
 
-#
+# Appends library to executable
 target_link_libraries(PolySurfRec
         ${SCIP_LIBRARIES}
         Eigen3::Eigen
