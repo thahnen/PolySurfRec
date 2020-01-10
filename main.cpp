@@ -16,23 +16,21 @@
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_point_set.h>
 
-#include "filehandler.h"
-
+#include "arghandler.h"
 
 typedef CGAL::SCIP_mixed_integer_program_traits<double>         MIP_Solver;
 
 typedef Kernel::FT                                              FT;
-typedef CGAL::Surface_mesh<Point>                               Surface_mesh;
 typedef CGAL::Polygonal_surface_reconstruction<Kernel>          Polygonal_surface_reconstruction;
 
-typedef CGAL::Shape_detection::Point_set::Sphere_neighbor_query<Kernel, Point_vector, Point_map>                        Neighbor_query;
-typedef CGAL::Shape_detection::Point_set::Least_squares_plane_fit_region<Kernel, Point_vector, Point_map, Normal_map>   Region_type;
-typedef CGAL::Shape_detection::Region_growing<Point_vector, Neighbor_query, Region_type>                                Region_growing;
+typedef CGAL::Shape_detection::Point_set::Sphere_neighbor_query<Kernel, std::vector<PNI>, Point_map>                        Neighbor_query;
+typedef CGAL::Shape_detection::Point_set::Least_squares_plane_fit_region<Kernel, std::vector<PNI>, Point_map, Normal_map>   Region_type;
+typedef CGAL::Shape_detection::Region_growing<std::vector<PNI>, Neighbor_query, Region_type>                                Region_growing;
 
-typedef CGAL::Shape_detection::Efficient_RANSAC_traits<Kernel, Point_vector, Point_map, Normal_map>     Traits;
-typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>                                                 Efficient_ransac;
-typedef CGAL::Shape_detection::Plane<Traits>                                                            Plane;
-typedef CGAL::Shape_detection::Point_to_shape_index_map<Traits>                                         Point_to_shape_index_map;
+typedef CGAL::Shape_detection::Efficient_RANSAC_traits<Kernel, std::vector<PNI>, Point_map, Normal_map>     Traits;
+typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>                                                     Efficient_ransac;
+typedef CGAL::Shape_detection::Plane<Traits>                                                                Plane;
+typedef CGAL::Shape_detection::Point_to_shape_index_map<Traits>                                             Point_to_shape_index_map;
 
 
 class Index_map {
@@ -62,14 +60,40 @@ private:
 /**
  *  The main routine, running an polygonal surface reconstruction algorithm on given data
  *
+ *  Usage: ./PolySurfRec -input [PLY | XYZ | OFF] <input file> -output [PLY | XYZ | OFF] {output file}
+ *          => Ouput defaults to OFF format / input file name + ".out.off"
+ *
+ *
  *  @param argc             length of the arguments
  *  @param argv             list of all given arguments
  *  @return                 EXIT_SUCCESS on success, otherwise EXIT_FAILURE
  */
 int main(int argc, char* argv[]) {
     /// 1) Check arguments (input file, input format, output file, output format
-    std::cout << "argc: " << argc << std::endl;
-    std::cout << "argv[0] " << argv[0] << std::endl;
+    arguments args;
+    if (parseArguments(args, argc, argv) != 0) {
+        // There was an error parsing the arguments!
+        std::cerr << "There was an error parsing the arguments!" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    /// 2) Handle different
+    /// 2) Load Points
+    std::vector<PNI> points;
+    if (loadPointsFromFile(points, args.input_file, args.input_format) != 0) {
+        // There was an error loading from file!
+        std::cerr << "There was an error loading from file!" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    CGAL::Surface_mesh<Point> model;
+
+    /// X) Save points
+    if (writeModelToFile(model, args.output_file, args.output_format) != 0) {
+        // There was an error writing to file!
+        std::cerr << "There was an error writing to file!" << std::endl;
+        return EXIT_FAILURE;
+    }
 
     std::cout << "Everything is fine!" << std::endl;
     return EXIT_SUCCESS;

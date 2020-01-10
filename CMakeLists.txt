@@ -24,6 +24,7 @@ include_directories(./include)
 # Adds files to the executable
 add_executable(PolySurfRec
         include/filehandler.h
+        include/arghandler.h
         main.cpp)
 
 # Add preprocessor macro for C++
@@ -34,6 +35,7 @@ target_compile_definitions(PolySurfRec
 
 # Appends library to executable
 target_link_libraries(PolySurfRec
+        stdc++fs
         ${SCIP_LIBRARIES}
         Eigen3::Eigen
         CGAL::CGAL)

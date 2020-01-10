@@ -5,6 +5,7 @@
 #ifndef POLYSURFREC_FILEHANDLER_H
 #define POLYSURFREC_FILEHANDLER_H
 
+#include <utility>
 #include <fstream>
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
@@ -19,12 +20,28 @@ typedef CGAL::Exact_predicates_inexact_constructions_kernel     Kernel;
 typedef Kernel::Point_3                                         Point;
 typedef Kernel::Vector_3                                        Vector;
 typedef boost::tuple<Point, Vector, int>                        PNI;
-typedef std::vector<PNI>                                        Point_vector;
+typedef std::pair<Point, Vector>                                PVP;
 typedef CGAL::Nth_of_tuple_property_map<0, PNI>                 Point_map;
 typedef CGAL::Nth_of_tuple_property_map<1, PNI>                 Normal_map;
 typedef CGAL::Nth_of_tuple_property_map<2, PNI>                 Plane_index_map;
 
 
+/**
+ *  Holds the input points
+ *  TODO: implement into "loadPointsFromFile" function etc.
+ */
+struct uPoints{
+    bool isPNI;
+    union {
+        std::vector<PNI> pni;
+        std::list<PVP> pvp;
+    };
+};
+
+
+/**
+ *  Different file formats
+ */
 enum FORMAT {
     PLY = 0,    // format with user defined planes
     XYZ,        // point cloud format
@@ -41,7 +58,7 @@ enum FORMAT {
  *  @param format           input format: PLY (user defined planes), XYZ / OFF (point cloud)
  *  @return                 SUCCESS, a error code otherwise
  */
-int loadPointsFromFile(Point_vector& points, const std::string& filepath, FORMAT format) {
+int loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, FORMAT format) {
     std::ifstream input(filepath.c_str());
     if (input.fail()) {
         // File cannot be opened
@@ -70,6 +87,43 @@ int loadPointsFromFile(Point_vector& points, const std::string& filepath, FORMAT
         case OFF:
             // TODO: not implemented yet -> Points type differ!
             return 1;
+    }
+
+    return 0;
+}
+
+
+/**
+ *  Writes a generated surface model to a file in PLY or XYZ / OFF format
+ *
+ *  @param model            the model to store in a file
+ *  @param filepath         path to the file to save to
+ *  @param format           output format: PLY (user defined planes), OFF (point cloud)
+ *  @return                 SUCCESS, a error code otherwise
+ */
+int writeModelToFile(const CGAL::Surface_mesh<Point>& model, const std::string& filepath, FORMAT format) {
+    std::ofstream output(filepath.c_str());
+    if (output.fail()) {
+        // File cannot be opened
+        return 1;
+    }
+
+    switch (format) {
+        case PLY:
+            if (!output || !CGAL::write_ply(output, model)) {
+                // Cannot write file
+                return 2;
+            }
+            break;
+        case OFF:
+            if (!output || !CGAL::write_off(output, model)) {
+                // Cannot write file
+                return 3;
+            }
+            break;
+        default:
+            // XYZ is not supported!
+            return 4;
     }
 
     return 0;
