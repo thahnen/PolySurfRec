@@ -20,23 +20,9 @@ typedef CGAL::Exact_predicates_inexact_constructions_kernel     Kernel;
 typedef Kernel::Point_3                                         Point;
 typedef Kernel::Vector_3                                        Vector;
 typedef boost::tuple<Point, Vector, int>                        PNI;
-typedef std::pair<Point, Vector>                                PVP;
 typedef CGAL::Nth_of_tuple_property_map<0, PNI>                 Point_map;
 typedef CGAL::Nth_of_tuple_property_map<1, PNI>                 Normal_map;
 typedef CGAL::Nth_of_tuple_property_map<2, PNI>                 Plane_index_map;
-
-
-/**
- *  Holds the input points
- *  TODO: implement into "loadPointsFromFile" function etc.
- */
-struct uPoints{
-    bool isPNI;
-    union {
-        std::vector<PNI> pni;
-        std::list<PVP> pvp;
-    };
-};
 
 
 /**
@@ -51,7 +37,6 @@ enum FORMAT {
 
 /**
  *  Loads points (with properties) from a file in PLY or XYZ / OFF format
- *  TODO: maybe use std::variant to store different point types or cast one to another!
  *
  *  @param points           where to store the points
  *  @param filepath         path to the file to load from
@@ -74,19 +59,19 @@ int loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, FO
                             Plane_index_map(),
                             CGAL::PLY_property<int>("segment_index")))) {
                 // Cannot read file!
-                return 1;
+                return 2;
             }
             break;
         case XYZ:
             if (!input || !CGAL::read_xyz_points(input, std::back_inserter(points),
                     CGAL::parameters::point_map(Point_map()).normal_map(Normal_map()))) {
                 // Cannot read file!
-                return 1;
+                return 3;
             }
             break;
         case OFF:
-            // TODO: not implemented yet -> Points type differ!
-            return 1;
+            // OFF format not supported yet!
+            return 4;
     }
 
     return 0;
@@ -94,7 +79,7 @@ int loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, FO
 
 
 /**
- *  Writes a generated surface model to a file in PLY or XYZ / OFF format
+ *  Writes a generated surface model to a file in PLY or OFF format
  *
  *  @param model            the model to store in a file
  *  @param filepath         path to the file to save to
@@ -122,7 +107,7 @@ int writeModelToFile(const CGAL::Surface_mesh<Point>& model, const std::string& 
             }
             break;
         default:
-            // XYZ is not supported!
+            // XYZ format not supported yet!
             return 4;
     }
 

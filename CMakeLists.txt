@@ -25,6 +25,7 @@ include_directories(./include)
 add_executable(PolySurfRec
         include/filehandler.h
         include/arghandler.h
+        include/shape_detection_methods.h
         main.cpp)
 
 # Add preprocessor macro for C++
