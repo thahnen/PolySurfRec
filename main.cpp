@@ -59,15 +59,23 @@ int main(int argc, char* argv[]) {
 
     /// 4) Handle points if given
     if (!args.planes) {
-        switch (args.meth) {
-            case SHAPE_DETECTION_METHOD::RANSAC:
-                // RANSAC algorithm
-                ransac(points);
-                break;
-            case SHAPE_DETECTION_METHOD::REGION_GROWING:
-                // region growing algorithm
-                region_growing(points);
+        try {
+            switch (args.meth) {
+                case SHAPE_DETECTION_METHOD::RANSAC:
+                    // RANSAC algorithm
+                    ransac(points);
+                    break;
+                case SHAPE_DETECTION_METHOD::REGION_GROWING:
+                    // region growing algorithm
+                    region_growing(points);
+            }
+        } catch (...) {
+            std::exception_ptr p = std::current_exception();
+            std::cerr << "Shape detection error: " << (p ? p.__cxa_exception_type()->name() : "null") << std::endl;
+            return EXIT_FAILURE;
         }
+
+
         std::cout << "Shape detection on points done correctly!" << std::endl;
     }
 

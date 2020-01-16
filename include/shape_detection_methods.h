@@ -14,6 +14,8 @@
 
 #include "filehandler.h"
 
+#define dbg(x) std::cout << x << std::endl
+
 /// Typedefs for RANSAC
 typedef CGAL::Shape_detection::Efficient_RANSAC_traits<Kernel, std::vector<PNI>, Point_map, Normal_map>                     Traits;
 typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>                                                                     Efficient_ransac;
@@ -92,12 +94,15 @@ void region_growing(std::vector<PNI>& points) {
 
     Neighbor_query nq(points, search_sphere_radius);
     Region_type rt(points, max_distance_to_plane, max_accepted_angle, min_region_size);
+    dbg("Neighbor_query / Region_type created!");
 
     Region_growing rg(points, nq, rt);
     std::vector<std::vector<std::size_t>> regions;
+    dbg("Region_growing/ regions created!");
 
     // Detects regions
     rg.detect(std::back_inserter(regions));
+    dbg("Regions detected!");
 
     // Stores the plane index of each point as third element to the tuple
     Index_map index_map(points, regions);
