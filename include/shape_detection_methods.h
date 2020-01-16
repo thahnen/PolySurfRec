@@ -80,6 +80,7 @@ void ransac(std::vector<PNI>& points) {
  *  @param points           the points used in the calculation / where the planes are stored to
  *
  *  TODO: what is the meaning of the constant values copied from the example?
+ *  TODO: check what throws an error!
  */
 void region_growing(std::vector<PNI>& points) {
     typedef Kernel::FT FT;

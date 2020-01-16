@@ -31,60 +31,65 @@ typedef CGAL::Polygonal_surface_reconstruction<Kernel>          Polygonal_surfac
  *  @return                 EXIT_SUCCESS on success, otherwise EXIT_FAILURE
  */
 int main(int argc, char* argv[]) {
+    int status;
+
     /// 1) Check arguments (input file, input format, output file, output format
     arguments args;
-    if (parseArguments(args, argc, argv) != 0) {
+    if ((status = parseArguments(args, argc, argv)) != 0) {
         // There was an error parsing the arguments!
-        std::cerr << "There was an error parsing the arguments!" << std::endl;
+        std::cerr << "There was an error parsing the arguments: " << status << std::endl;
         return EXIT_FAILURE;
     }
+    std::cout << "Arguments parsed correctly!" << std::endl;
 
     /// 2) Handle different input formats
     if (args.input_format == FORMAT::OFF) {
         // Not supported yet!
         return EXIT_FAILURE;
     }
+    std::cout << "Input format correct!" << std::endl;
 
     /// 3) Load from file
     std::vector<PNI> points;
-    if (loadPointsFromFile(points, args.input_file, args.input_format) != 0) {
-        std::cerr << "There was an error loading from file!" << std::endl;
+    if ((status = loadPointsFromFile(points, args.input_file, args.input_format)) != 0) {
+        std::cerr << "There was an error loading from file: " << status << std::endl;
         return EXIT_FAILURE;
     }
+    std::cout << "Points loaded correctly!" << std::endl;
 
     /// 4) Handle points if given
     if (!args.planes) {
         switch (args.meth) {
             case SHAPE_DETECTION_METHOD::RANSAC:
-                try {
-                    // RANSAC algorithm
-                    ransac(points);
-                } catch (...) {
-                    // Some unknown error occurred
-                    return EXIT_FAILURE;
-                }
+                // RANSAC algorithm
+                ransac(points);
+                break;
             case SHAPE_DETECTION_METHOD::REGION_GROWING:
-                try {
-                    // region growing algorithm
-                    region_growing(points);
-                } catch (...) {
-                    // Some unknown error occurred!
-                    return EXIT_FAILURE;
-                }
+                // region growing algorithm
+                region_growing(points);
         }
+        std::cout << "Shape detection on points done correctly!" << std::endl;
     }
 
     /// 5) Create polygonal surface reconstruction algorithm
     Polygonal_surface_reconstruction algo(points, Point_map(), Normal_map(), Plane_index_map());
     CGAL::Surface_mesh<Point> model;
 
-    /// X) Save points
+    /// 6) Surface reconstruction
+    if (!algo.reconstruct<MIP_Solver>(model)) {
+        // Reconstruction failed
+        std::cerr << "There was an error reconstructing the surfaces: " << algo.error_message() << std::endl;
+        return EXIT_FAILURE;
+    }
+    std::cout << "Surface reconstruction done correctly" << std::endl;
+
+    /// 7) Save points
     if (writeModelToFile(model, args.output_file, args.output_format) != 0) {
         // There was an error writing to file!
         std::cerr << "There was an error writing to file!" << std::endl;
         return EXIT_FAILURE;
     }
+    std::cout << "Output points saved correctly!" << std::endl;
 
-    std::cout << "Everything is fine!" << std::endl;
     return EXIT_SUCCESS;
 }

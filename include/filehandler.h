@@ -7,6 +7,7 @@
 
 #include <utility>
 #include <fstream>
+#include <iostream>
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
@@ -44,15 +45,15 @@ enum FORMAT {
  *  @return                 SUCCESS, a error code otherwise
  */
 int loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, FORMAT format) {
-    std::ifstream input(filepath.c_str());
+    std::ifstream input(filepath);
     if (input.fail()) {
-        // File cannot be opened
+        // Input file cannot be opened!
         return 1;
     }
 
     switch (format) {
         case PLY:
-            if (!input || !CGAL::read_ply_points_with_properties(input, std::back_inserter(points),
+            if (!CGAL::read_ply_points_with_properties(input, std::back_inserter(points),
                     CGAL::make_ply_point_reader(Point_map()),
                     CGAL::make_ply_normal_reader(Normal_map()),
                     std::make_pair(
@@ -63,7 +64,7 @@ int loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, FO
             }
             break;
         case XYZ:
-            if (!input || !CGAL::read_xyz_points(input, std::back_inserter(points),
+            if (!CGAL::read_xyz_points(input, std::back_inserter(points),
                     CGAL::parameters::point_map(Point_map()).normal_map(Normal_map()))) {
                 // Cannot read file!
                 return 3;

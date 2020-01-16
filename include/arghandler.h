@@ -102,7 +102,7 @@ int parseArguments(arguments& args, int argc, char* argv[]) {
         return 1;
     }
 
-    if (!regex(argv[2], "(ply|xyz|off", std::regex_constants::ECMAScript | std::regex_constants::icase)) {
+    if (!regex(argv[2], "(ply|xyz|off)", std::regex_constants::ECMAScript | std::regex_constants::icase)) {
         // No input format given
         return 2;
     }
@@ -126,7 +126,7 @@ int parseArguments(arguments& args, int argc, char* argv[]) {
         return 3;
     }
 
-    args.input_file = std::string(argv[3]);
+    args.input_file = std::string(argv[4]);
 
     // Given input type
     if (!regex(argv[5], "-given")) {
