@@ -5,7 +5,6 @@
 
 #include <iostream>
 
-#include <CGAL/property_map.h>
 #include <CGAL/Surface_mesh.h>
 #include <CGAL/Polygonal_surface_reconstruction.h>
 #include <CGAL/SCIP_mixed_integer_program_traits.h>
@@ -66,8 +65,15 @@ int main(int argc, char* argv[]) {
                     ransac(points);
                     break;
                 case SHAPE_DETECTION_METHOD::REGION_GROWING:
-                    // region growing algorithm
-                    region_growing(points);
+                    // region growing algorithm (using example parameter values)
+                    std::tuple<Kernel::FT, Kernel::FT, Kernel::FT, std::size_t> example(
+                            Kernel::FT(2) / Kernel::FT(100),
+                            Kernel::FT(2) / Kernel::FT(1000),
+                            Kernel::FT(25),
+                            200
+                    );
+
+                    region_growing(points, example);
             }
         } catch (...) {
             std::exception_ptr p = std::current_exception();

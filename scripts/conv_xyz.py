@@ -17,15 +17,48 @@
 # ================================================================================
 
 
+import re
 import os
 import sys
 
 
+
+
+# ================================================================================
+#                       Error codes returned by the program
+# ================================================================================
+ERR_NO_PARAM = 1
+ERR_PARAM_WRONG = 2
+ERR_NO_XYZ_FILES = 3
+ERR_LINES_WRONG = 4
+ERR_POS_NO_FLOATS = 5
+ERR_NORM_NO_FLOATS = 6
+
+
+
+# ================================================================================
+#                   Checks if given path ends with ".xyz"
+# ================================================================================
+def checkXYZFile(path):
+    return bool(
+        re.search(r'(?i).xyz$', path)
+    )
+
+
+
+# ================================================================================
+#                                   MAIN-ROUTINE:
+#
+#   1) Check for file/ folder
+#   2) For every file remove unnecessary information
+#   3) Write (X|Y|Z) position vector + (NX|NY|NZ) normal vector to file
+#
+# ================================================================================
 if __name__ == "__main__":
     args = sys.argv[:]
     if len(args) != 2:
         print("No file/ folder to convert was given!")
-        exit(1)
+        exit(ERR_NO_PARAM)
 
     # Check if path is file/ folder that exist!
     path = args[1]
@@ -33,52 +66,55 @@ if __name__ == "__main__":
 
     if os.path.isdir(path):
         for file in os.listdir(path):
-            if file.split(".")[-1] == "xyz":
+            if checkXYZFile(file):
                 files.append(os.path.join(path, file))
     elif os.path.isfile(path):
-        if path.split(".")[-1] != "xyz":
-            print("Wrong file given! Only files ending with .xyz allowed!")
-            exit(2)
-
-        files.append(path)
+        if checkXYZFile(path):
+            files.append(path)
     else:
         print("Given parameter is neather a existing file nor folder!")
-        exit(3)
+        exit(ERR_PARAM_WRONG)
+
+    # Min. one correct file given
+    if len(files) == 0:
+        print("Wrong file given! Only files ending with .xyz allowed!")
+        exit(ERR_NO_XYZ_FILES)
 
     # Converts file
     for file in files:
-        contents = []
+        print("Input path:\t" + file)
 
         # Read input
+        contents = []
         with open(file, "rt") as input:
             for line in input:
                 arr = line.split(" ")
                 if len(arr) < 6:
                     print("The lines are not formatted correctly! There should be 'X Y Z [...] NX NY NZ' given!")
-                    exit(4)
+                    exit(ERR_LINES_WRONG)
                 
-                # First 3 elements equals position vector
+                # First 3 elements should equal position vector
                 xyz = arr[:3]
                 for coord in xyz:
                     if not "." in coord:
                         print("Position vector must contain floats! They have to look like 1.23456789...")
-                        exit(5)
+                        exit(ERR_POS_NO_FLOATS)
                 
-                # Last 3 elements equals normal vector
+                # Last 3 elements should equal normal vector
                 nxnynz = arr[-3:]
                 for norm in nxnynz:
                     if not "." in norm:
                         print("Normal vector must contain floats! They have to look like 1.23456789...")
-                        exit(6)
+                        exit(ERR_NORM_NO_FLOATS)
                 
                 contents.append(" ".join(xyz + nxnynz))
         
         # Write output
         path = file + ".out"
-        print("Pfad: " + path)
+        print("Output path:\t" + path + "\n")
 
         with open(path, "w") as output:
             for elem in contents:
                 output.write(elem)
     
-    print("Everything done!")
+    print("Conversion done!")

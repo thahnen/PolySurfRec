@@ -2,12 +2,16 @@
 
 ## Abstract
 
-Kommt noch.
+Software to run the provided algorithms with different modifications on provided data.
+Also available as small dynamic library (coming later).
 
 ### Usability
 
 Implemented using C++17!
-Kommt noch.
+
+```
+./PolySurfRec -informat [PLY | XYZ | OFF] -infile <path> -given [planes | points] -shdetection [ransac | region_growing] -outformat [PLY | XYZ | OFF]
+```
 
 ---
 
@@ -24,4 +28,5 @@ Needs following software installed:
 
 ## Name
 
-Kommt noch.
+Poly(gonal) Surf(ace) Rec(onstruction).
+It's that simple!

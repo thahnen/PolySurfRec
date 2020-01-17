@@ -80,17 +80,14 @@ void ransac(std::vector<PNI>& points) {
  *  Runs an region growing algorithm on the given points to find planes and store them
  *
  *  @param points           the points used in the calculation / where the planes are stored to
- *
- *  TODO: what is the meaning of the constant values copied from the example?
- *  TODO: check what throws an error!
+ *  @param file_parameters  the file parameters for the input file used in region growing
  */
-void region_growing(std::vector<PNI>& points) {
+void region_growing(std::vector<PNI>& points, const std::tuple<Kernel::FT, Kernel::FT, Kernel::FT, std::size_t>& file_parameters) {
     typedef Kernel::FT FT;
 
-    const FT search_sphere_radius       = FT(2) / FT(100);
-    const FT max_distance_to_plane      = FT(2) / FT(1000);
-    const FT max_accepted_angle         = FT(25);
-    const std::size_t min_region_size   = 200;
+    FT search_sphere_radius, max_distance_to_plane, max_accepted_angle;
+    std::size_t min_region_size;
+    std::tie(search_sphere_radius, max_distance_to_plane, max_accepted_angle, min_region_size) = file_parameters;
 
     Neighbor_query nq(points, search_sphere_radius);
     Region_type rt(points, max_distance_to_plane, max_accepted_angle, min_region_size);
