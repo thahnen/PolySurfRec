@@ -11,6 +11,7 @@
 #include <filesystem>
 
 #include "filehandler.h"
+#include "surface_reconstruction_methods.h"
 
 
 enum SHAPE_DETECTION_METHOD {
@@ -28,6 +29,7 @@ struct arguments {
     std::string input_file, output_file;    // path for input and output
     bool planes;                            // planes already given (points if not)
     SHAPE_DETECTION_METHOD meth;            // shape detection method when points are given
+    DETAIL level;                           // level of detail for surface reconstruction
 };
 
 
@@ -141,8 +143,8 @@ int parseArguments(arguments& args, int argc, char* argv[]) {
 
     args.planes = regex(argv[6], "planes");
 
-    // Check if more is given (shape detection and output format)
-    if (argc > 10) {
+    // Check if more is given (shape detection, level of detail and output format)
+    if (argc > 12) {
         // Shape detection method
         if(!regex(argv[7], "-shdetection")) {
             // No "-shdetection" given
@@ -166,18 +168,39 @@ int parseArguments(arguments& args, int argc, char* argv[]) {
             args.meth = SHAPE_DETECTION_METHOD::NONE;
         }
 
+        // Level of detail
+        if (!regex(argv[9], "-lod")) {
+            // No "-lod" given
+            return 12;
+        }
+
+        if (!regex(argv[10], "(most|normal|least|less)", std::regex_constants::ECMAScript | std::regex_constants::icase)) {
+            // No level of detail given
+            return 13;
+        }
+
+        if (regex(argv[10], "most")) {
+            args.level = DETAIL::MOST;
+        } else if (regex(argv[10], "normal")) {
+            args.level = DETAIL::NORMAL;
+        } else if (regex(argv[10], "least")) {
+            args.level = DETAIL::LEAST;
+        } else {
+            args.level = DETAIL::LESS;
+        }
+
         // Output format
-        if (!regex(argv[9], "-outformat")) {
+        if (!regex(argv[11], "-outformat")) {
             // No "-output" given
             return 4;
         }
 
-        if (!regex(argv[10], "(ply|xyz|off)", std::regex_constants::ECMAScript | std::regex_constants::icase)) {
+        if (!regex(argv[12], "(ply|xyz|off)", std::regex_constants::ECMAScript | std::regex_constants::icase)) {
             // No output format given
             return 6;
         }
 
-        if (regex(argv[10], "ply")) {
+        if (regex(argv[12], "ply")) {
             args.output_format = FORMAT::PLY;
         } else if (regex(argv[10], "xyz")) {
             args.output_format = FORMAT::XYZ;

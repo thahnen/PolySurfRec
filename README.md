@@ -10,7 +10,7 @@ Also available as small dynamic library (coming later).
 Implemented using C++17!
 
 ```
-./PolySurfRec -informat [PLY | XYZ | OFF] -infile <path> -given [planes | points] -shdetection [ransac | region_growing] -outformat [PLY | XYZ | OFF]
+./PolySurfRec -informat [PLY | XYZ | OFF] -infile <path> -given [planes | points] -shdetection [ransac | region_growing] -lod [MOST | NORMAL | LEAST | LESS] -outformat [PLY | XYZ | OFF]
 ```
 
 ---

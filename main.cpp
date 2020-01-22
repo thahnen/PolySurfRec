@@ -5,21 +5,15 @@
 
 #include <iostream>
 
-#include <CGAL/Surface_mesh.h>
-#include <CGAL/Polygonal_surface_reconstruction.h>
-#include <CGAL/SCIP_mixed_integer_program_traits.h>
-
 #include "arghandler.h"
 #include "shape_detection_methods.h"
-
-typedef CGAL::SCIP_mixed_integer_program_traits<double>         MIP_Solver;
-typedef CGAL::Polygonal_surface_reconstruction<Kernel>          Polygonal_surface_reconstruction;
+#include "surface_reconstruction_methods.h"
 
 
 /**
  *  The main routine, running an polygonal surface reconstruction algorithm on given data
  *
- *  Usage: ./PolySurfRec -informat [PLY | XYZ | OFF] -infile <path> -given [planes | points] -shdetection [ransac | region_growing] -outformat [PLY | XYZ | OFF]
+ *  Usage: ./PolySurfRec -informat [PLY | XYZ | OFF] -infile <path> -given [planes | points] -shdetection [ransac | region_growing] -lod [MOST | NORMAL | LEAST | LESS] -outformat [PLY | XYZ | OFF]
  *          => shape detection defaults to the RANSAC algorithm => not implemented yet!
  *          => output format defaults to OFF                    => not implemented yet!
  *
@@ -85,19 +79,16 @@ int main(int argc, char* argv[]) {
         std::cout << "Shape detection on points done correctly!" << std::endl;
     }
 
-    /// 5) Create polygonal surface reconstruction algorithm
-    Polygonal_surface_reconstruction algo(points, Point_map(), Normal_map(), Plane_index_map());
+    /// 5) Surface reconstruction
     CGAL::Surface_mesh<Point> model;
-
-    /// 6) Surface reconstruction
-    if (!algo.reconstruct<MIP_Solver>(model)) {
+    if (!reconstructSurfaces(points, model, args.level)) {
         // Reconstruction failed
-        std::cerr << "There was an error reconstructing the surfaces: " << algo.error_message() << std::endl;
+        std::cerr << "Surface reconstruction failed!" << std::endl;
         return EXIT_FAILURE;
     }
     std::cout << "Surface reconstruction done correctly" << std::endl;
 
-    /// 7) Save points
+    /// 6) Save points
     if (writeModelToFile(model, args.output_file, args.output_format) != 0) {
         // There was an error writing to file!
         std::cerr << "There was an error writing to file!" << std::endl;
