@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(PolySurfRec
-        VERSION         1.1.5
+        VERSION         1.2.0
         DESCRIPTION     "Implementation of an CGAL Polygonal Surface Reconstruction algorithm for city models"
         HOMEPAGE_URL    "https://github.com/thahnen/PolySurfRec"
         LANGUAGES       CXX)
@@ -23,10 +23,15 @@ include_directories(./include)
 
 # Adds files to the executable
 add_executable(PolySurfRec
+        include/errorhandler.h
         include/filehandler.h
+        src/filehandler.cpp
         include/arghandler.h
+        src/arghandler.cpp
         include/shape_detection_methods.h
+        src/shape_detection_methods.cpp
         include/surface_reconstruction_methods.h
+        src/surface_reconstruction_methods.cpp
         main.cpp)
 
 # Add preprocessor macro for C++

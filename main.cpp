@@ -13,22 +13,20 @@
 /**
  *  The main routine, running an polygonal surface reconstruction algorithm on given data
  *
- *  Usage: ./PolySurfRec -informat [PLY | XYZ | OFF] -infile <path> -given [planes | points] -shdetection [ransac | region_growing] -lod [MOST | NORMAL | LEAST | LESS] -outformat [PLY | XYZ | OFF]
+ *  Usage: ./PolySurfRec -informat [PLY | XYZ | OFF] -infile <path> -given [PLANES | POINTS] -shdetection [RANSAC | REGION_GROWING] -lod [MOST | NORMAL | LESS | LEAST] -outformat [PLY | XYZ | OFF]
  *          => shape detection defaults to the RANSAC algorithm => not implemented yet!
  *          => output format defaults to OFF                    => not implemented yet!
- *
- *  TODO: when using region growing default parameter values for file must be given!
  *
  *  @param argc             length of the arguments
  *  @param argv             list of all given arguments
  *  @return                 EXIT_SUCCESS on success, otherwise EXIT_FAILURE
  */
 int main(int argc, char* argv[]) {
-    int status;
+    ECODE status;
 
     /// 1) Check arguments (input file, input format, output file, output format
     arguments args;
-    if ((status = parseArguments(args, argc, argv)) != 0) {
+    if ((status = parseArguments(args, argc, argv)) != ECODE::SUCCESS) {
         // There was an error parsing the arguments!
         std::cerr << "There was an error parsing the arguments: " << status << std::endl;
         return EXIT_FAILURE;
@@ -44,7 +42,7 @@ int main(int argc, char* argv[]) {
 
     /// 3) Load from file
     std::vector<PNI> points;
-    if ((status = loadPointsFromFile(points, args.input_file, args.input_format)) != 0) {
+    if ((status = loadPointsFromFile(points, args.input_file, args.input_format)) != ECODE::SUCCESS) {
         std::cerr << "There was an error loading from file: " << status << std::endl;
         return EXIT_FAILURE;
     }
@@ -57,6 +55,7 @@ int main(int argc, char* argv[]) {
                 case SHAPE_DETECTION_METHOD::RANSAC:
                     // RANSAC algorithm
                     ransac(points);
+                    std::cout << "RANSAC done!" << std::endl;
                     break;
                 case SHAPE_DETECTION_METHOD::REGION_GROWING:
                     // region growing algorithm (using example parameter values)
@@ -68,6 +67,7 @@ int main(int argc, char* argv[]) {
                     );
 
                     region_growing(points, example);
+                    std::cout << "REGION GROWING done!" << std::endl;
             }
         } catch (...) {
             std::exception_ptr p = std::current_exception();
@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Surface reconstruction done correctly" << std::endl;
 
     /// 6) Save points
-    if (writeModelToFile(model, args.output_file, args.output_format) != 0) {
+    if (writeModelToFile(model, args.output_file, args.output_format) != ECODE::SUCCESS) {
         // There was an error writing to file!
         std::cerr << "There was an error writing to file!" << std::endl;
         return EXIT_FAILURE;
