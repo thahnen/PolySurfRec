@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(PolySurfRec
-        VERSION         1.2.0
+        VERSION         1.2.5
         DESCRIPTION     "Implementation of an CGAL Polygonal Surface Reconstruction algorithm for city models"
         HOMEPAGE_URL    "https://github.com/thahnen/PolySurfRec"
         LANGUAGES       CXX)

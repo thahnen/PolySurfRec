@@ -27,7 +27,7 @@ namespace SurfRec {
     }
 
     /**
-     *  Structure to hold shape detection parameters for file
+     *  Structure to hold shape detection options
      */
     struct sd_options {
         bool ransac;                // ransac given or not
@@ -71,7 +71,7 @@ namespace SurfRec {
      *  @param path             path to file
      *  @param algOptions       the options used in the whole reconstruction process, start to finish
      */
-    DLL void polygonalReconstruction(std::string path, options& algOptions);
+    DLL void polygonalReconstruction(std::string& path, options& algOptions);
 
     /**
      *  Runs polygonal surface reconstruction from given points and outputs to given model
@@ -91,7 +91,7 @@ namespace SurfRec {
          * 
          *  @param points       points used to find/ store shapes
          */
-        void ransac(std::vector<PNI>& points);
+        DLL void ransac(std::vector<PNI>& points);
 
         /**
          *  Region growing for shape detection using file specific parameter
@@ -99,7 +99,7 @@ namespace SurfRec {
          *  @param points       points used to find/ store shapes
          *  @param parameter    file specific parameters
          */
-        void region_growing(std::vector<PNI>& points, struct rg_params& parameter);
+        DLL void region_growing(std::vector<PNI>& points, struct rg_params& parameter);
     }
 }
 
