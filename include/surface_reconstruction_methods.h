@@ -18,7 +18,8 @@ typedef CGAL::Polygonal_surface_reconstruction<Kernel>          Polygonal_surfac
 
 /// Different levels of detail
 enum DETAIL {
-    MOST = 0,   // highest level of detail
+    USER = 0,   // level is defined directly by user
+    MOST,       // highest level of detail
     NORMAL,     // normal level of detail (standard values given by the method)
     LESS,       // slightly less than normal level of detail
     LEAST       // lowest level of detail
@@ -28,7 +29,7 @@ enum DETAIL {
 /**
  *  Reconstructs surfaces from given points and stores them in given model
  *
- *  @param points           the points used for reconstruction
+ *  @param points           the points used for reconstruction (after shape detection)
  *  @param model            the output surface mesh
  *  @param level            the level of detail, the reconstruction should be
  *  @return                 true if reconstruction was successfull
