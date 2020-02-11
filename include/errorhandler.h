@@ -21,6 +21,8 @@ enum ECODE{
     FH_SAVE_XYZ_FAIL,       // filehandler: cannot write XYZ file
     FH_SAVE_OFF_FAIL,       // filehandler: cannot write OFF file
 
+    SR_RECONSTRUCT_FAIL,    // surface reconstruction: reconstruction using solver failed
+
     /// argument handler error codes
     AH_TO_LITTLE_PARAMS,    // argument handler: not enough parameter given
     AH_NO_INFORMAT,         // argument handler: no "-informat" given

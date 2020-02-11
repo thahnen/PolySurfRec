@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(PolySurfRec
-        VERSION         1.2.5
+        VERSION         1.3.0
         DESCRIPTION     "Implementation of an CGAL Polygonal Surface Reconstruction algorithm for city models"
         HOMEPAGE_URL    "https://github.com/thahnen/PolySurfRec"
         LANGUAGES       CXX)
@@ -21,6 +21,39 @@ find_package(CGAL REQUIRED)
 # Include directory
 include_directories(./include)
 
+########################################################################################################################
+#
+#       SHARED LIBRARY (using Eigen/ SCIP/ CGAL)
+#
+########################################################################################################################
+add_library(SurfRec
+        SHARED
+            include/errorhandler.h
+            include/definitions.h
+            src/SurfRec.cpp)
+
+set_target_properties(SurfRec
+        PROPERTIES
+            VERSION ${PROJECT_VERSION}
+            CXX_VISIBILITY_PRESET hidden
+            PUBLIC_HEADER include/SurfRec.h)
+
+target_include_directories(SurfRec
+        PUBLIC
+            ${PROJECT_SOURCE_DIR}/include)
+
+target_compile_definitions(SurfRec
+        PUBLIC
+            CGAL_USE_SCIP)
+
+target_link_libraries(SurfRec
+        stdc++fs
+        ${SCIP_LIBRARIES}
+        Eigen3::Eigen
+        CGAL::CGAL)
+
+
+
 # Adds files to the executable
 add_executable(PolySurfRec
         include/errorhandler.h
@@ -28,10 +61,6 @@ add_executable(PolySurfRec
         src/filehandler.cpp
         include/arghandler.h
         src/arghandler.cpp
-        include/shape_detection_methods.h
-        src/shape_detection_methods.cpp
-        include/surface_reconstruction_methods.h
-        src/surface_reconstruction_methods.cpp
         main.cpp)
 
 # Add preprocessor macro for C++

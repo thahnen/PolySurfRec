@@ -19,26 +19,7 @@
 #include <CGAL/IO/read_off_points.h>
 #include <CGAL/IO/Writer_OFF.h>
 
-#include "errorhandler.h"
-
-
-/// Typedefs for data handling
-typedef CGAL::Exact_predicates_inexact_constructions_kernel     Kernel;
-typedef Kernel::Point_3                                         Point;
-typedef Kernel::Vector_3                                        Vector;
-typedef boost::tuple<Point, Vector, int>                        PNI;
-typedef CGAL::Nth_of_tuple_property_map<0, PNI>                 Point_map;
-typedef CGAL::Nth_of_tuple_property_map<1, PNI>                 Normal_map;
-typedef CGAL::Nth_of_tuple_property_map<2, PNI>                 Plane_index_map;
-
-
-/// Different file formats
-enum FORMAT {
-    PLY = 0,    // format with user defined planes
-    XYZ,        // point cloud format
-    OFF,        // point cloud format
-};
-
+#include "definitions.h"
 
 /**
  *  Checks if given path exists
@@ -66,7 +47,7 @@ bool isFile(const char* path);
  *  @param format           input format: PLY (user defined planes), XYZ / OFF (point cloud)
  *  @return                 SUCCESS, a error code otherwise
  */
-ECODE loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, FORMAT format);
+ECODE loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, SurfRec::FORMAT format);
 
 
 /**
@@ -77,7 +58,7 @@ ECODE loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, 
  *  @param format           output format: PLY (user defined planes), OFF (point cloud)
  *  @return                 SUCCESS, a error code otherwise
  */
-ECODE writeModelToFile(const CGAL::Surface_mesh<Point>& model, const std::string& filepath, FORMAT format);
+ECODE writeModelToFile(const CGAL::Surface_mesh<Point>& model, const std::string& filepath, SurfRec::FORMAT format);
 
 
 #endif //POLYSURFREC_FILEHANDLER_H
