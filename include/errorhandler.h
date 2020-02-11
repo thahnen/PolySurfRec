@@ -7,6 +7,7 @@
 
 
 /// Different error codes
+// TODO: rename surface reconstruction errors to distinguish polygonal/ poisson
 enum ECODE{
     SUCCESS = 0,            // there was no error
 
@@ -21,7 +22,10 @@ enum ECODE{
     FH_SAVE_XYZ_FAIL,       // filehandler: cannot write XYZ file
     FH_SAVE_OFF_FAIL,       // filehandler: cannot write OFF file
 
+    SD_RANSAC_DETECT,       // shape detection: RANSAC could not detect shapes
+
     SR_RECONSTRUCT_FAIL,    // surface reconstruction: reconstruction using solver failed
+    SR_POISSON_FAIL,        // surface reconstruction: poisson reconstruction failed
 
     /// argument handler error codes
     AH_TO_LITTLE_PARAMS,    // argument handler: not enough parameter given

@@ -79,6 +79,7 @@ namespace SurfRec {
         OFF,        // point cloud format
     };
 
+
     /// 3.3) Structure to hold region detection parameters for file (shape detection)
     struct rg_params {
         Kernel::FT par1;    // search sphere radius ???
@@ -92,6 +93,7 @@ namespace SurfRec {
         bool ransac;                // ransac given or not
         struct rg_params* regGrow;  // region growing info if not ransac
     };
+
 
     /// 4.2) Surface reconstruction: Different levels of detail
     enum DETAIL {

@@ -31,7 +31,7 @@ bool isFile(const char* path) {
 
 
 /// Loads points (with properties) from a file in PLY or XYZ / OFF format
-ECODE loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, FORMAT format) {
+ECODE loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, SurfRec::FORMAT format) {
     std::ifstream input(filepath);
     if (input.fail()) {
         // Input file cannot be opened!
@@ -39,7 +39,7 @@ ECODE loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, 
     }
 
     switch (format) {
-        case PLY:
+        case SurfRec::FORMAT::PLY:
             if (!CGAL::read_ply_points_with_properties(input, std::back_inserter(points),
                     CGAL::make_ply_point_reader(Point_map()),
                     CGAL::make_ply_normal_reader(Normal_map()),
@@ -50,14 +50,14 @@ ECODE loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, 
                 return FH_LOAD_PLY_FAIL;
             }
             break;
-        case XYZ:
+        case SurfRec::FORMAT::XYZ:
             if (!CGAL::read_xyz_points(input, std::back_inserter(points),
                     CGAL::parameters::point_map(Point_map()).normal_map(Normal_map()))) {
                 // Cannot read file!
                 return FH_LOAD_XYZ_FAIL;
             }
             break;
-        case OFF:
+        case SurfRec::FORMAT::OFF:
             // OFF format not supported yet!
             return FH_LOAD_OFF_FAIL;
     }
@@ -67,7 +67,7 @@ ECODE loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, 
 
 
 /// Writes a generated surface model to a file in PLY or OFF format
-ECODE writeModelToFile(const CGAL::Surface_mesh<Point>& model, const std::string& filepath, FORMAT format) {
+ECODE writeModelToFile(const CGAL::Surface_mesh<Point>& model, const std::string& filepath, SurfRec::FORMAT format) {
     std::ofstream output(filepath.c_str());
     if (output.fail()) {
         // File cannot be opened
@@ -75,16 +75,16 @@ ECODE writeModelToFile(const CGAL::Surface_mesh<Point>& model, const std::string
     }
 
     switch (format) {
-        case PLY:
+        case SurfRec::FORMAT::PLY:
             if (!output || !CGAL::write_ply(output, model)) {
                 // Cannot write file
                 return FH_SAVE_PLY_FAIL;
             }
             break;
-        case XYZ:
+        case SurfRec::FORMAT::XYZ:
             // XYZ format not supported yet!
             return FH_SAVE_XYZ_FAIL;
-        case OFF:
+        case SurfRec::FORMAT::OFF:
             if (!output || !CGAL::write_off(output, model)) {
                 // Cannot write file
                 return FH_SAVE_OFF_FAIL;

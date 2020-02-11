@@ -1,3 +1,5 @@
+#include <CGAL/poisson_surface_reconstruction.h>
+
 #include "SurfRec.h"
 #include "filehandler.h"
 
@@ -75,14 +77,39 @@ ECODE SurfRec::polygonalReconstruction(std::vector<PNI>& points, CGAL::Surface_m
 }
 
 
+/// Runs poisson surface reconstruction from given points and outputs to given model
+// TODO: maybe add indicator for level of detail like for polygon surface reconstruction
+ECODE SurfRec::poissonReconstruction(std::vector<PNI>& points, CGAL::Surface_mesh<Point>& model) {
+    double average_spacing = CGAL::compute_average_spacing<CGAL::Sequential_tag>(
+            points,
+            6,
+            CGAL::parameters::point_map(Point_map())
+    );
+
+    if (CGAL::poisson_surface_reconstruction_delaunay(
+            points.begin(), points.end(),
+            Point_map(), Normal_map(),
+            model, average_spacing)) {
+        return SR_POISSON_FAIL;
+    }
+
+    return SUCCESS;
+}
+
+
 /// Efficient RANSAC for shape detection
+// TODO: maybe add plane regularization (https://cgal.geometryfactory.com/CGAL/doc/master/Shape_detection/Shape_detection_2efficient_RANSAC_and_plane_regularization_8cpp-example.html)
 ECODE SurfRec::Shape_Detection::ransac(std::vector<PNI>& points) {
     Efficient_ransac ransac;
     ransac.set_input(points);
+
+    // The only shape useful with city models are planes
     ransac.add_shape_factory<Plane>();
 
     // Detects the planes
-    ransac.detect();
+    if (!ransac.detect()) {
+        return SD_RANSAC_DETECT;
+    }
 
     // Stores the plane index of each point as third element to the tuple
     Point_to_shape_index_map sim(points, ransac.planes());
@@ -95,15 +122,9 @@ ECODE SurfRec::Shape_Detection::ransac(std::vector<PNI>& points) {
 
 
 /// Region growing for shape detection using file specific parameter
-// TODO: minimze, delete useless stuff
 ECODE SurfRec::Shape_Detection::region_growing(std::vector<PNI>& points, struct SurfRec::rg_params& parameter) {
-    Kernel::FT search_sphere_radius = parameter.par1;
-    Kernel::FT max_distance_to_plane = parameter.par2;
-    Kernel::FT max_accepted_angle = parameter.par3;
-    std::size_t min_region_size = parameter.par4;
-
-    Neighbor_query nq(points, search_sphere_radius);
-    Region_type rt(points, max_distance_to_plane, max_accepted_angle, min_region_size);
+    Neighbor_query nq(points, parameter.par1);
+    Region_type rt(points, parameter.par2, parameter.par3, parameter.par4);
 
     Region_growing rg(points, nq, rt);
     std::vector<std::vector<std::size_t>> regions;
