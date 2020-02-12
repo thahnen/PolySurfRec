@@ -40,7 +40,9 @@ ECODE SurfRec::polygonalReconstruction(std::string& path, struct SurfRec::option
 
     // 4) Surface reconstruction
     CGAL::Surface_mesh<Point> model;
-    polygonalReconstruction(points, model, algOptions.detail);
+    if ((status = polygonalReconstruction(points, model, algOptions.detail)) != ECODE::SUCCESS) {
+        return status;
+    }
 
     // 5) Save output to file
     return File_Handling::writeModelToFile(model, path, algOptions.outputFormat);
@@ -75,13 +77,16 @@ ECODE SurfRec::polygonalReconstruction(std::vector<PNI>& points, CGAL::Surface_m
         }
     }
 
-    if (ret)    return SUCCESS;
-    else        return SR_RECONSTRUCT_FAIL;
+    if (ret) return SUCCESS;
+
+    std::cerr << "[SurfRec::polygonalReconstruction] Solver error: " << algorithm.error_message() << std::endl;
+    return SR_POLY_RECON_FAIL;
 }
 
 
 /// Runs poisson surface reconstruction from given points and outputs to given model
 // TODO: maybe add indicator for level of detail like for polygon surface reconstruction
+// TODO: evaluate return value of "CGAL::poisson_surface_reconstruction_delaunay" function
 ECODE SurfRec::poissonReconstruction(std::vector<PNI>& points, CGAL::Surface_mesh<Point>& model) {
     double average_spacing = CGAL::compute_average_spacing<CGAL::Sequential_tag>(
             points,

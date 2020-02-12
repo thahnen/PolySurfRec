@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(PolySurfRec
-        VERSION         1.4.0
+        VERSION         1.5.0
         DESCRIPTION     "Implementation of multiple CGAL Surface Reconstruction algorithms used on city models"
         HOMEPAGE_URL    "https://github.com/thahnen/PolySurfRec"
         LANGUAGES       CXX)
@@ -28,10 +28,10 @@ include_directories(./include)
 ########################################################################################################################
 add_library(SurfRec
         SHARED
-            include/errorhandler.h
-            include/definitions.h
+            include/Error_Handling.h
+            include/Definitions.h
             src/Shape_Detection.cpp
-        src/File_Handling.cpp
+            src/File_Handling.cpp
             src/SurfRec.cpp)
 
 set_target_properties(SurfRec
@@ -66,6 +66,7 @@ find_library(SurfRec REQUIRED)
 ########################################################################################################################
 #
 #           TEST FILE (USING SPECIAL POINT CLOUDS)
+#           TODO: rename test!
 #
 ########################################################################################################################
 # Adds files to the executable

@@ -91,7 +91,6 @@ ECODE SurfRec::File_Handling::readPointsFromFile(std::vector<PNI>& points, const
 
 
 /// Writes a generated surface model to a file in PLY or OFF format
-// TODO: check if file already exists!
 ECODE SurfRec::File_Handling::writeModelToFile(const CGAL::Surface_mesh<Point>& model, const std::string& filepath, SurfRec::FORMAT format) {
     std::ofstream output(filepath);
     if (output.fail()) {

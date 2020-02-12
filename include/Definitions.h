@@ -15,7 +15,7 @@
 #include <CGAL/SCIP_mixed_integer_program_traits.h>
 #include <CGAL/Polygonal_surface_reconstruction.h>
 
-#include "errorhandler.h"
+#include "Error_Handling.h"
 
 
 /// 1) Typedefs for data handling
@@ -86,12 +86,18 @@ namespace SurfRec {
         Kernel::FT par2;    // maximum distance to plane ???
         Kernel::FT par3;    // maximum angle between points ???
         std::size_t par4;   // minimum region size ???
+
+        rg_params(Kernel::FT npar1, Kernel::FT npar2, Kernel::FT npar3, std::size_t npar4)
+                : par1(npar1), par2(npar2), par3(npar3), par4(npar4) {}
     };
 
     /// 3.4) Structure to hold shape detection options
     struct sd_options {
         bool ransac;                // ransac given or not
         struct rg_params* regGrow;  // region growing info if not ransac
+
+        sd_options(bool nRansac = true, struct rg_params* nRG = nullptr)
+                : ransac(nRansac), regGrow(nRG) {}
     };
 
 
@@ -109,6 +115,9 @@ namespace SurfRec {
         double fitting;     // weight for the data fitting
         double coverage;    // weight for the point coverage
         double complexity;  // weight for the model complexity
+
+        usr_detail(double nFitting, double nCoverage, double nComplexity)
+                : fitting(nFitting), coverage(nCoverage), complexity(nComplexity) {}
     };
 
     /// 4.4) Structure to hold informations about the level of detail for reconstruction
@@ -116,7 +125,8 @@ namespace SurfRec {
         DETAIL level;               // indicates the level or a user given one
         struct usr_detail* details; // optional user given detail information (level == DETAIL::USER)
 
-        sr_options(DETAIL nlevel = DETAIL::MOST, struct usr_detail* ndetails = nullptr) : level(nlevel), details(ndetails) {}
+        sr_options(DETAIL nLevel = DETAIL::MOST, struct usr_detail* nDetails = nullptr)
+                : level(nLevel), details(nDetails) {}
     };
 
 
@@ -125,10 +135,13 @@ namespace SurfRec {
         FORMAT inputFormat;             // input file format
         FORMAT outputFormat;            // output file format
 
+        struct sr_options detail;       // information about the level of detail;
+
         bool shapesGiven;               // are shapes already given in input
         struct sd_options* shapeDet;    // options for shape detection (if no shapes given directly)
 
-        struct sr_options detail;       // information about the level of detail;
+        options(FORMAT nIF, FORMAT nOF, struct sr_options nDetail, bool nSG = true, struct sd_options* nSD = nullptr)
+                : inputFormat(nIF), outputFormat(nOF), detail(nDetail), shapesGiven(nSG), shapeDet(nSD) {}
     };
 }
 

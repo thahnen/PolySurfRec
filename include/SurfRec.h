@@ -14,7 +14,7 @@
 
 
 #include <string>
-#include "definitions.h"
+#include "Definitions.h"
 
 
 namespace SurfRec {

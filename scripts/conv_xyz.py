@@ -94,20 +94,30 @@ if __name__ == "__main__":
                     exit(ERR_LINES_WRONG)
                 
                 # First 3 elements should equal position vector
-                xyz = arr[:3]
-                for coord in xyz:
-                    if not "." in coord:
-                        print("Position vector must contain floats! They have to look like 1.23456789...")
+                xyz = []
+                for c in arr[:3]:
+                    try:
+                        xyz.append(str(
+                            float(c)        # try/except aims at this conversion!
+                        ))
+                    except ValueError:
+                        print("Position vector must contain floats! They have to look like [-]1[.23456789]...")
                         exit(ERR_POS_NO_FLOATS)
                 
+
                 # Last 3 elements should equal normal vector
-                nxnynz = arr[-3:]
-                for norm in nxnynz:
-                    if not "." in norm:
-                        print("Normal vector must contain floats! They have to look like 1.23456789...")
+                nxnynz = []
+                for nc in arr[-3:]:
+                    try:
+                        nxnynz.append(str(
+                            float(nc)       # try/except aims at this conversion!
+                        ))
+                    except ValueError:
+                        print("Normal vector must contain floats! They have to look like [-]1[.23456789]...")
                         exit(ERR_NORM_NO_FLOATS)
                 
-                contents.append(" ".join(xyz + nxnynz))
+
+                contents.append(" ".join(xyz) + " " + " ".join(nxnynz) + "\n")
         
         # Write output
         path = file + ".out"
