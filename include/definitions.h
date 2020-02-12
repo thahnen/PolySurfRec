@@ -115,6 +115,8 @@ namespace SurfRec {
     struct sr_options {
         DETAIL level;               // indicates the level or a user given one
         struct usr_detail* details; // optional user given detail information (level == DETAIL::USER)
+
+        sr_options(DETAIL nlevel = DETAIL::MOST, struct usr_detail* ndetails = nullptr) : level(nlevel), details(ndetails) {}
     };
 
 

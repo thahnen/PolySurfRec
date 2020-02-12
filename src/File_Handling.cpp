@@ -2,17 +2,36 @@
 // Created by thahnen on 24.01.20.
 //
 
-#include "filehandler.h"
+#include <utility>
+#include <iostream>
+#include <sys/stat.h>
+#include <filesystem>
+
+#include <CGAL/Surface_mesh.h>
+#include <CGAL/IO/read_ply_points.h>
+#include <CGAL/IO/read_xyz_points.h>
+
+#include "SurfRec.h"
 
 
-/// Checks if given path exists
+/**
+ *  Checks if given path exists
+ *
+ *  @param path             the path to test on existence
+ *  @return                 whether the path exists
+ */
 bool exists(const char* path) {
     struct stat buf;
     return (stat(path, &buf) == 0);
 }
 
 
-/// Checks if given path is an existing file
+/**
+ *  Checks if given path is an existing file
+ *
+ *  @param path             the path to test on existence
+ *  @return                 whether the file exists
+ */
 bool isFile(const char* path) {
     if (!exists(path))
         return false;
@@ -31,15 +50,20 @@ bool isFile(const char* path) {
 
 
 /// Loads points (with properties) from a file in PLY or XYZ / OFF format
-ECODE loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, SurfRec::FORMAT format) {
+ECODE SurfRec::File_Handling::readPointsFromFile(std::vector<PNI>& points, const std::string& filepath, SurfRec::FORMAT format) {
+    if (!isFile(filepath.c_str())) {
+        // File does not exist or is no file
+        return ECODE::FH_LOAD_EXIST_FAIL;
+    }
+
     std::ifstream input(filepath);
     if (input.fail()) {
         // Input file cannot be opened!
-        return FH_LOAD_OPEN_FAIL;
+        return ECODE::FH_LOAD_OPEN_FAIL;
     }
 
     switch (format) {
-        case SurfRec::FORMAT::PLY:
+        case FORMAT::PLY:
             if (!CGAL::read_ply_points_with_properties(input, std::back_inserter(points),
                     CGAL::make_ply_point_reader(Point_map()),
                     CGAL::make_ply_normal_reader(Normal_map()),
@@ -47,47 +71,48 @@ ECODE loadPointsFromFile(std::vector<PNI>& points, const std::string& filepath, 
                             Plane_index_map(),
                             CGAL::PLY_property<int>("segment_index")))) {
                 // Cannot read file!
-                return FH_LOAD_PLY_FAIL;
+                return ECODE::FH_LOAD_PLY_FAIL;
             }
             break;
-        case SurfRec::FORMAT::XYZ:
+        case FORMAT::XYZ:
             if (!CGAL::read_xyz_points(input, std::back_inserter(points),
                     CGAL::parameters::point_map(Point_map()).normal_map(Normal_map()))) {
                 // Cannot read file!
-                return FH_LOAD_XYZ_FAIL;
+                return ECODE::FH_LOAD_XYZ_FAIL;
             }
             break;
-        case SurfRec::FORMAT::OFF:
+        case FORMAT::OFF:
             // OFF format not supported yet!
-            return FH_LOAD_OFF_FAIL;
+            return ECODE::FH_LOAD_OFF_FAIL;
     }
 
-    return SUCCESS;
+    return ECODE::SUCCESS;
 }
 
 
 /// Writes a generated surface model to a file in PLY or OFF format
-ECODE writeModelToFile(const CGAL::Surface_mesh<Point>& model, const std::string& filepath, SurfRec::FORMAT format) {
-    std::ofstream output(filepath.c_str());
+// TODO: check if file already exists!
+ECODE SurfRec::File_Handling::writeModelToFile(const CGAL::Surface_mesh<Point>& model, const std::string& filepath, SurfRec::FORMAT format) {
+    std::ofstream output(filepath);
     if (output.fail()) {
         // File cannot be opened
-        return FH_SAVE_OPEN_FAIL;
+        return ECODE::FH_SAVE_OPEN_FAIL;
     }
 
     switch (format) {
-        case SurfRec::FORMAT::PLY:
+        case FORMAT::PLY:
             if (!output || !CGAL::write_ply(output, model)) {
                 // Cannot write file
-                return FH_SAVE_PLY_FAIL;
+                return ECODE::FH_SAVE_PLY_FAIL;
             }
             break;
-        case SurfRec::FORMAT::XYZ:
+        case FORMAT::XYZ:
             // XYZ format not supported yet!
-            return FH_SAVE_XYZ_FAIL;
-        case SurfRec::FORMAT::OFF:
+            return ECODE::FH_SAVE_XYZ_FAIL;
+        case FORMAT::OFF:
             if (!output || !CGAL::write_off(output, model)) {
                 // Cannot write file
-                return FH_SAVE_OFF_FAIL;
+                return ECODE::FH_SAVE_OFF_FAIL;
             }
     }
 

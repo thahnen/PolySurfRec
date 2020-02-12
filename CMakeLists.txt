@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(PolySurfRec
-        VERSION         1.3.0
-        DESCRIPTION     "Implementation of an CGAL Polygonal Surface Reconstruction algorithm for city models"
+        VERSION         1.4.0
+        DESCRIPTION     "Implementation of multiple CGAL Surface Reconstruction algorithms used on city models"
         HOMEPAGE_URL    "https://github.com/thahnen/PolySurfRec"
         LANGUAGES       CXX)
 
@@ -30,6 +30,8 @@ add_library(SurfRec
         SHARED
             include/errorhandler.h
             include/definitions.h
+            src/Shape_Detection.cpp
+        src/File_Handling.cpp
             src/SurfRec.cpp)
 
 set_target_properties(SurfRec
@@ -55,16 +57,19 @@ target_link_libraries(SurfRec
 
 ########################################################################################################################
 #
+#           AFTER LIBRARY IS BUILD FIND IT!
+#
+########################################################################################################################
+find_library(SurfRec REQUIRED)
+
+
+########################################################################################################################
+#
 #           TEST FILE (USING SPECIAL POINT CLOUDS)
 #
 ########################################################################################################################
 # Adds files to the executable
 add_executable(PolySurfRec
-        include/errorhandler.h
-        include/filehandler.h
-        src/filehandler.cpp
-        include/arghandler.h
-        src/arghandler.cpp
         main.cpp)
 
 # Add preprocessor macro for C++
@@ -75,7 +80,4 @@ target_compile_definitions(PolySurfRec
 
 # Appends library to executable
 target_link_libraries(PolySurfRec
-        stdc++fs
-        ${SCIP_LIBRARIES}
-        Eigen3::Eigen
-        CGAL::CGAL)
+        SurfRec)

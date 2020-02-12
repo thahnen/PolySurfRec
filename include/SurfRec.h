@@ -1,3 +1,7 @@
+//
+// Created by thahnen on 05.02.20.
+//
+
 #pragma once
 #ifndef POLYSURFREC_SURFREC_H
 #define POLYSURFREC_SURFREC_H
@@ -60,7 +64,7 @@ namespace SurfRec {
 
     /*******************************************************************************************************************
      *
-     *      X) SHAPE DETECTION ALGORITHM
+     *      3) SHAPE DETECTION ALGORITHM
      *
      ******************************************************************************************************************/
     namespace Shape_Detection {
@@ -79,6 +83,35 @@ namespace SurfRec {
          *  @param parameter    SUCCESS if Region Growing finished successful, an error otherwise
          */
         DLL ECODE region_growing(std::vector<PNI>& points, struct SurfRec::rg_params& parameter);
+    }
+
+
+    /*******************************************************************************************************************
+     *
+     *      4) FILE HANDLING
+     *
+     ******************************************************************************************************************/
+    namespace File_Handling {
+        /**
+         *  Reads points (with properties) from a file in PLY or XYZ / OFF format
+         *
+         *  @param points           where to store the points
+         *  @param filepath         path to the file to load from
+         *  @param format           input format: PLY (user defined planes), XYZ / OFF (point cloud)
+         *  @return                 SUCCESS, a error code otherwise
+         */
+        DLL ECODE readPointsFromFile(std::vector<PNI>& points, const std::string& filepath, SurfRec::FORMAT format);
+
+        /**
+         *  Writes a generated surface model to a file in PLY or XYZ / OFF format
+         *
+         *  @param model            the model to store in a file
+         *  @param filepath         path to the file to save to
+         *  @param format           output format: PLY (user defined planes), XYZ / OFF (point cloud)
+         *  @return                 SUCCESS, a error code otherwise
+         */
+        DLL ECODE writeModelToFile(const CGAL::Surface_mesh<Point>& model, const std::string& filepath,
+                                    SurfRec::FORMAT format);
     }
 }
 
