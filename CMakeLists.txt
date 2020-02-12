@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
-project(PolySurfRec
-        VERSION         1.5.0
+project(SurfRec
+        VERSION         1.5.5
         DESCRIPTION     "Implementation of multiple CGAL Surface Reconstruction algorithms used on city models"
-        HOMEPAGE_URL    "https://github.com/thahnen/PolySurfRec"
+        HOMEPAGE_URL    "https://github.com/thahnen/SurfRec"
         LANGUAGES       CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -26,7 +26,7 @@ include_directories(./include)
 #           SHARED LIBRARY (using Eigen/ SCIP/ CGAL)
 #
 ########################################################################################################################
-add_library(SurfRec
+add_library(${PROJECT_NAME}
         SHARED
             include/Error_Handling.h
             include/Definitions.h
@@ -34,21 +34,21 @@ add_library(SurfRec
             src/File_Handling.cpp
             src/SurfRec.cpp)
 
-set_target_properties(SurfRec
+set_target_properties(${PROJECT_NAME}
         PROPERTIES
             VERSION ${PROJECT_VERSION}
             CXX_VISIBILITY_PRESET hidden
             PUBLIC_HEADER include/SurfRec.h)
 
-target_include_directories(SurfRec
+target_include_directories(${PROJECT_NAME}
         PUBLIC
             ${PROJECT_SOURCE_DIR}/include)
 
-target_compile_definitions(SurfRec
+target_compile_definitions(${PROJECT_NAME}
         PUBLIC
             CGAL_USE_SCIP)
 
-target_link_libraries(SurfRec
+target_link_libraries(${PROJECT_NAME}
         stdc++fs
         ${SCIP_LIBRARIES}
         Eigen3::Eigen
@@ -60,7 +60,7 @@ target_link_libraries(SurfRec
 #           AFTER LIBRARY IS BUILD FIND IT!
 #
 ########################################################################################################################
-find_library(SurfRec REQUIRED)
+find_library(${PROJECT_NAME} REQUIRED)
 
 
 ########################################################################################################################

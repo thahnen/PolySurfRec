@@ -29,13 +29,12 @@ ECODE SurfRec::polygonalReconstruction(std::string& path, struct SurfRec::option
     // 3) Shape detection (if needed)
     if (!algOptions.shapesGiven) {
         if (algOptions.shapeDet->ransac) {
-            // TODO: change return type
-            SurfRec::Shape_Detection::ransac(points);
+            status = SurfRec::Shape_Detection::ransac(points);
         } else {
-            // TODO: change return type
-            SurfRec::Shape_Detection::region_growing(points,
-                                                     reinterpret_cast<rg_params&>(algOptions.shapeDet->regGrow));
+            status = SurfRec::Shape_Detection::region_growing(points, *(algOptions.shapeDet->regGrow));
         }
+
+        if (status != ECODE::SUCCESS) return status;
     }
 
     // 4) Surface reconstruction

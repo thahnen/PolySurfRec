@@ -1,8 +1,3 @@
-#ifndef CGAL_USE_SCIP
-#   error "SCIP not found, use alternatively GLPK (which is not implemented yet)!"
-#endif
-
-
 #include <regex>
 #include <iostream>
 #include <SurfRec.h>

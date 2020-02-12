@@ -12,7 +12,14 @@
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_point_set.h>
 
-#include <CGAL/SCIP_mixed_integer_program_traits.h>
+#if defined (CGAL_USE_SCIP) && !defined (CGAL_USE_GLPK)
+#   include <CGAL/SCIP_mixed_integer_program_traits.h>
+#elif !defined (CGAL_USE_SCIP) && defined (CGAL_USE_GLPK)
+#   include <CGAL/GLPK_mixed_integer_program_traits.h>
+#else
+#   error "SCIP or GLPK must be used exclusively!"
+#endif
+
 #include <CGAL/Polygonal_surface_reconstruction.h>
 
 #include "Error_Handling.h"
@@ -67,7 +74,11 @@ private:
 
 
 /// 4.1) Surface reconstruction: Typedefs for polygonal surface reconstruction
+#ifdef CGAL_USE_SCIP
 typedef CGAL::SCIP_mixed_integer_program_traits<double>         MIP_Solver;
+#elif CGAL_USE_GLPK
+typedef CGAL::GLPK_mixed_integer_program_traits<double>         MIP_Solver;
+#endif
 typedef CGAL::Polygonal_surface_reconstruction<Kernel>          Polygonal_surface_reconstruction;
 
 
@@ -96,7 +107,7 @@ namespace SurfRec {
         bool ransac;                // ransac given or not
         struct rg_params* regGrow;  // region growing info if not ransac
 
-        sd_options(bool nRansac = true, struct rg_params* nRG = nullptr)
+        explicit sd_options(bool nRansac = true, struct rg_params* nRG = nullptr)
                 : ransac(nRansac), regGrow(nRG) {}
     };
 
@@ -125,7 +136,7 @@ namespace SurfRec {
         DETAIL level;               // indicates the level or a user given one
         struct usr_detail* details; // optional user given detail information (level == DETAIL::USER)
 
-        sr_options(DETAIL nLevel = DETAIL::MOST, struct usr_detail* nDetails = nullptr)
+        explicit sr_options(DETAIL nLevel = DETAIL::MOST, struct usr_detail* nDetails = nullptr)
                 : level(nLevel), details(nDetails) {}
     };
 
