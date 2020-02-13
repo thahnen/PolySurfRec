@@ -64,7 +64,7 @@ ECODE SurfRec::polygonalReconstruction(std::vector<PNI>& points, CGAL::Surface_m
         ret = algorithm.reconstruct<MIP_Solver>(model, 0.3, 0.2, 0.5);
     } else if (level.level == DETAIL::LEAST) {
         ret = algorithm.reconstruct<MIP_Solver>(model, 0.2, 0.1, 0.7);
-    } else {
+    } else if (level.level == DETAIL::USER) {
         // Check if level.details points to valid
         if (level.details) {
             ret = algorithm.reconstruct<MIP_Solver>(
@@ -74,6 +74,8 @@ ECODE SurfRec::polygonalReconstruction(std::vector<PNI>& points, CGAL::Surface_m
                 level.details->complexity
             );
         }
+    } else {
+        return SR_POLY_NOT_IMPL;
     }
 
     if (ret) return SUCCESS;
@@ -84,21 +86,41 @@ ECODE SurfRec::polygonalReconstruction(std::vector<PNI>& points, CGAL::Surface_m
 
 
 /// Runs poisson surface reconstruction from given points and outputs to given model
-// TODO: maybe add indicator for level of detail like for polygon surface reconstruction
 // TODO: evaluate return value of "CGAL::poisson_surface_reconstruction_delaunay" function
-ECODE SurfRec::poissonReconstruction(std::vector<PNI>& points, CGAL::Surface_mesh<Point>& model) {
+ECODE SurfRec::poissonReconstruction(std::vector<PNI>& points, CGAL::Surface_mesh<Point>& model,
+                                        struct SurfRec::sr_options& level) {
     double average_spacing = CGAL::compute_average_spacing<CGAL::Sequential_tag>(
             points,
             6,
             CGAL::parameters::point_map(Point_map())
     );
 
-    if (CGAL::poisson_surface_reconstruction_delaunay(
-            points.begin(), points.end(),
-            Point_map(), Normal_map(),
-            model, average_spacing)) {
-        return SR_POISSON_FAIL;
+    bool ret = false;
+    if (level.level == DETAIL::MOST) {
+        return SR_POISSON_NOT_IMPL;
+    } else if (level.level == DETAIL::NORMAL) {
+        ret = CGAL::poisson_surface_reconstruction_delaunay(
+                points.begin(), points.end(),
+                Point_map(), Normal_map(),
+                model, average_spacing);
+    } else if (level.level == DETAIL::LESS) {
+        return SR_POISSON_NOT_IMPL;
+    } else if (level.level == DETAIL::LEAST) {
+        return SR_POISSON_NOT_IMPL;
+    } else if (level.level == DETAIL::USER) {
+        ret = CGAL::poisson_surface_reconstruction_delaunay(
+                points.begin(), points.end(),
+                Point_map(), Normal_map(),
+                model, average_spacing,
+                level.details->fitting,
+                level.details->coverage,
+                level.details->complexity);
+    } else {
+        return SR_POISSON_NOT_IMPL;
     }
 
-    return SUCCESS;
+    if (ret) return SUCCESS;
+
+    std::cerr << "[SurfRec::poissonReconstruction] Some unknown error occured!" << std::endl;
+    return SR_POLY_RECON_FAIL;
 }

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(SurfRec
-        VERSION         1.5.5
+        VERSION         1.6.0
         DESCRIPTION     "Implementation of multiple CGAL Surface Reconstruction algorithms used on city models"
         HOMEPAGE_URL    "https://github.com/thahnen/SurfRec"
         LANGUAGES       CXX)

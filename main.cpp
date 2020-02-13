@@ -1,4 +1,5 @@
 #include <regex>
+#include <chrono>
 #include <iostream>
 #include <SurfRec.h>
 
@@ -49,19 +50,25 @@ int main(int argc, char* argv[]) {
 
     /// 2) Read points from file
     std::vector<PNI> points;
+    auto begin = std::chrono::steady_clock::now();
     if ((status = SurfRec::File_Handling::readPointsFromFile(points, input, SurfRec::FORMAT::XYZ)) != ECODE::SUCCESS) {
         std::cerr << "There was an error reading from input file: " << status << std::endl;
         return EXIT_FAILURE;
     }
-    std::cout << "Points reading done correctly!" << std::endl;
+    std::cout << "Points reading done correctly! Time: "
+                << std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now()-begin).count() << "s"
+                << std::endl;
 
 
     /// 3) Shape detection using RANSAC
+    begin = std::chrono::steady_clock::now();
     if ((status = SurfRec::Shape_Detection::ransac(points)) != ECODE::SUCCESS) {
         std::cerr << "There was an error using RANSAC for shape detection: " << status << std::endl;
         return EXIT_FAILURE;
     }
-    std::cout << "RANSAC shape detection done correctly!" << std::endl;
+    std::cout << "RANSAC shape detection done correctly! Time: "
+                << std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now()-begin).count() << "s"
+                << std::endl;
 
 
     /// 4) Surface reconstruction
@@ -71,27 +78,38 @@ int main(int argc, char* argv[]) {
         /// 4.1) Polygonal algorithm
         SurfRec::sr_options level_options(SurfRec::DETAIL::MOST);
 
+        begin = std::chrono::steady_clock::now();
         if ((status = SurfRec::polygonalReconstruction(points, model, level_options)) != ECODE::SUCCESS) {
             std::cerr << "There was an error using polygonal surface reconstruction: " << status << std::endl;
             return EXIT_FAILURE;
         }
-        std::cout << "Polygonal surface reconstruction done correctly!" << std::endl;
+        std::cout << "Polygonal surface reconstruction done correctly! Time: "
+                    << std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now()-begin).count() << "s"
+                    << std::endl;
     } else {
         /// 4.2) Poisson algorithm
-        if ((status = SurfRec::poissonReconstruction(points, model)) != ECODE::SUCCESS) {
+        SurfRec::sr_options level_options(SurfRec::DETAIL::NORMAL);
+
+        begin = std::chrono::steady_clock::now();
+        if ((status = SurfRec::poissonReconstruction(points, model, level_options)) != ECODE::SUCCESS) {
             std::cerr << "There was an error using poisson surface reconstruction: " << status << std::endl;
             return EXIT_FAILURE;
         }
-        std::cout << "Poisson surface reconstruction done correctly!" << std::endl;
+        std::cout << "Poisson surface reconstruction done correctly! Time: "
+                    << std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now()-begin).count() << "s"
+                    << std::endl;
     }
 
 
     /// 5) Write model to file
+    begin = std::chrono::steady_clock::now();
     if ((status = SurfRec::File_Handling::writeModelToFile(model, output, SurfRec::FORMAT::OFF)) != ECODE::SUCCESS) {
         std::cerr << "There was an error saving to output file: " << status << std::endl;
         return EXIT_FAILURE;
     }
-    std::cout << "Model writing done correctly!" << std::endl;
+    std::cout << "Model writing done correctly! Time: "
+                << std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now()-begin).count() << "s"
+                << std::endl;
 
     return EXIT_SUCCESS;
 }

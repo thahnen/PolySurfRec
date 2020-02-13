@@ -25,7 +25,9 @@ enum ECODE{
     SD_RANSAC_DETECT,       // Shape Detection: RANSAC could not detect shapes
 
     SR_WRONG_OPTIONS,       // Surface Reconstruction (Polygonal): wrong options given
+    SR_POLY_NOT_IMPL,       // Surface Reconstruction (Polygonal): level of detail not implemented yet
     SR_POLY_RECON_FAIL,     // Surface Reconstruction (Polygonal): reconstruction using solver failed
+    SR_POISSON_NOT_IMPL,    // Surface Reconstruction (Poisson): level of detail not implemented yet
     SR_POISSON_FAIL,        // Surface Reconstruction (Poisson): reconstruction failed
 };
 

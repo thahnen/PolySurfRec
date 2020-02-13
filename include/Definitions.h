@@ -122,6 +122,7 @@ namespace SurfRec {
     };
 
     /// 4.3) Structure to hold user defined options for the solver ?
+    // TODO: use same structure for poisson (same parameters, other name)
     struct usr_detail {
         double fitting;     // weight for the data fitting
         double coverage;    // weight for the point coverage
@@ -132,6 +133,7 @@ namespace SurfRec {
     };
 
     /// 4.4) Structure to hold informations about the level of detail for reconstruction
+    // TODO: use same structure for poisson surface reconstrction
     struct sr_options {
         DETAIL level;               // indicates the level or a user given one
         struct usr_detail* details; // optional user given detail information (level == DETAIL::USER)

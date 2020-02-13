@@ -57,9 +57,11 @@ namespace SurfRec {
      *
      *  @param points           input points for reconstruction
      *  @param model            output surface mesh
+     *  @param level            level of detail, the reconstruction should be
      *  @return                 SUCCESS if reconstruction was successful, an error otherwise
      */
-    DLL ECODE poissonReconstruction(std::vector<PNI>& points, CGAL::Surface_mesh<Point>& model);
+    DLL ECODE poissonReconstruction(std::vector<PNI>& points, CGAL::Surface_mesh<Point>& model,
+                                        struct SurfRec::sr_options& level);
 
 
     /*******************************************************************************************************************
